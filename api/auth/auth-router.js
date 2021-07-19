@@ -85,7 +85,7 @@ router.post('/login', Auth.checkUsernameExists, async (req, res, next) => {
  */
 
 router.get('/logout', async (req, res, next) => {
-  if (!req.session) {
+  if (!req.session.user) {
     res.json({message: 'no session'})
   } else (
     req.session.destroy(error => {
