@@ -4,8 +4,8 @@ const express = require('express');
 const Auth = require('./auth-middleware');
 const router = express.Router();
 
-router.post('/register', Auth.checkPasswordLength, Auth.checkUsernameFree, async (res, req, next) => {
-
+router.post('/register', Auth.checkPasswordLength, Auth.checkUsernameFree, async (req, res, next) => {
+  res.json({message: "registered"})
 });
 
 /**
