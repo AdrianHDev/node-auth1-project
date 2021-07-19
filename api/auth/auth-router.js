@@ -47,7 +47,7 @@ router.post('/login', Auth.checkUsernameExists, async (req, res, next) => {
     req.session.user = req.user
     res.json({message: `Welcome ${req.user.username}`})
   } else {
-    next({status: 401, message: "Invalid credentials"})
+    next({status: 401, message: "invalid credentials"})
   }
 
 })
@@ -83,6 +83,21 @@ router.post('/login', Auth.checkUsernameExists, async (req, res, next) => {
     "message": "no session"
   }
  */
+
+router.get('/logout', async (req, res, next) => {
+  if (!req.session) {
+    res.json({message: 'no session'})
+  } else (
+    req.session.destroy(error => {
+      if (error) {
+        next(error)
+      } else {
+        res.json({message: 'logged out'})
+      }
+    })
+
+  )
+})
 
  
 // Don't forget to add the router to the `exports` object so it can be required in other modules
