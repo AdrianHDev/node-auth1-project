@@ -3,9 +3,18 @@
 const express = require('express');
 const Auth = require('./auth-middleware');
 const router = express.Router();
+const Users = require("../users/users-model")
+const bcrypt = require('bcryptjs');
 
 router.post('/register', Auth.checkPasswordLength, Auth.checkUsernameFree, async (req, res, next) => {
-  res.json({message: "registered"})
+  const {username, password} = req.body;
+  const hashedpass = bcrypt.hashSync(password, 8)
+  try {
+    const newUser = await Users.add({username, password: hashedpass})
+    res.status(201).json(newUser);
+  } catch (error) {
+    next({status: 500, message: "Internal server error", error})
+  }
 });
 
 /**
@@ -32,8 +41,15 @@ router.post('/register', Auth.checkPasswordLength, Auth.checkUsernameFree, async
  */
 
 
-router.post('/login', Auth.checkUsernameExists, async (res, req, next) => {
-  
+router.post('/login', Auth.checkUsernameExists, async (req, res, next) => {
+  const password = req.body.password;
+  if (bcrypt.compareSync(password, req.user.password)) {
+    req.session.user = req.user
+    res.json({message: `Welcome ${req.user.username}`})
+  } else {
+    next({status: 401, message: "Invalid credentials"})
+  }
+
 })
 /**
   2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
